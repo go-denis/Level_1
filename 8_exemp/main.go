@@ -2,50 +2,35 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"strconv"
+	"math/rand"
+	"unsafe"
 )
 
 /*
 Дана переменная int64. Разработать программу которая устанавливает i-й бит в 1 или 0
 */
+
+// подсмотрел решение так как не знал как делать, но разобрался
 func main() {
-	log.Println(changeOneBit(12, 3, 1))
+	var (
+		num  = rand.Int63()
+		nBit = 4
+	)
+	//Устанавливаем 1
+	numAdd := AddOne(num, nBit)
+	numZero := AddZero(num, nBit)
+	//Используем %b для вывода именно битового значения
+	fmt.Printf("Было \t %b", *(*uint64)(unsafe.Pointer(&num))) //переводим в двоичный формат
+	fmt.Printf("\nУстанавливаем 1\t %b", *(*uint64)(unsafe.Pointer(&numAdd)))
+	fmt.Printf("\nУстанавливаем 0\t %b", *(*uint64)(unsafe.Pointer(&numZero)))
 }
 
-func IntToBits(num int) string {
-	return strconv.FormatInt(int64(num), 2)
+func AddOne(num int64, pointer int) int64 {
+	numAdd := num | 1<<(pointer-1) //Отнимаем 1 чтобы вернуть в нужное положение
+	return numAdd                  //num | 1<<(pointer-1)
 }
 
-func bitsToInt(s string) int64 {
-	newVal, err := strconv.ParseInt(s, 2, 64)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return newVal
-}
-
-func changeOneBit(num, position, newBit int) int64 {
-	if position > 0 && num == 0 {
-		return int64(num)
-	}
-
-	if newBit > 1 || newBit < 0 {
-		log.Println("Новый бит может быть только 1 или 0")
-		return int64(num)
-	}
-
-	bits := []byte(IntToBits(num))
-	fmt.Printf("Было \t %s(%v)\n", string(bits), num)
-
-	if position >= len(bits) {
-		log.Printf("В числе %v нет %v разрядов. Разярядов в числе %v только %v\n", num, position, num, len(bits))
-		return int64(num)
-	}
-
-	newB := []byte(IntToBits(newBit))
-	bits[position] = newB[0]
-	newVal := bitsToInt(string(bits))
-	fmt.Printf("Стало \t %s(%v)\n", string(bits), newVal)
-	return newVal
+func AddZero(num int64, pointer int) int64 {
+	//numAdd := num | 1<<pointer
+	return num &^ (1 << (pointer - 1))
 }

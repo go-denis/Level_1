@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"time"
 	"unsafe"
 )
 
@@ -23,11 +22,11 @@ func Off(n int64, i int) int64 {
 }
 
 func main() {
-	rand.Seed(time.Now().Unix())
+	//rand.Seed(time.Now().Unix())
 
 	// Случайное число типа int64
 	// Первый rand генерирует -1 или 1, отображая [0,1] на [-1,1]
-	p := (rand.Int63n(2)*2 - 1) * rand.Int63()
+	p := rand.Int63()
 
 	on := On(p, 5)
 	off := Off(p, 5)
