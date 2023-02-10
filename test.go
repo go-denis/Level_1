@@ -2,38 +2,45 @@ package main
 
 import (
 	"fmt"
-	"sync"
+	"math/big"
+	"math/rand"
+	"time"
 )
 
-type ConCount struct {
-	mu  sync.Mutex
-	cnt int
+func sum(a, b *big.Int) *big.Int {
+	var c big.Int
+	c.Add(a, b)
+	return &c
+}
+
+func dif(a, b *big.Int) *big.Int {
+	var c big.Int
+	c.Neg(b)
+	return sum(a, &c)
+}
+
+func mul(a, b *big.Int) *big.Int {
+	var c big.Int
+	c.Mul(a, b)
+	return &c
+}
+
+func div(a, b *big.Int) *big.Int {
+	var c big.Int
+	c.Quo(a, b)
+	return &c
 }
 
 func main() {
+	rand.Seed(time.Now().UnixMilli())
 
-	// Счетчик с Mutex
-	c := ConCount{cnt: 0}
+	// a, b in [-10*2^50, 10*2^50]
+	a := big.NewInt((rand.Int63n(21) - 10) * 1 << (rand.Int63n(31) + 20))
+	b := big.NewInt((rand.Int63n(21) - 10) * 1 << (rand.Int63n(31) + 20))
 
-	// Атомарный счетчик
-	var c1 int64
-
-	var wg sync.WaitGroup
-	n := 10
-	wg.Add(n)
-	for i := 0; i < n; i++ {
-		go func() {
-			for i := 0; i < 10; i++ {
-				//atomic.AddInt64(&c1, 1)
-
-				c.mu.Lock()
-				c.cnt++
-				c.mu.Unlock()
-			}
-			wg.Done()
-		}()
-	}
-	wg.Wait()
-	fmt.Println("atomic", c1)
-	fmt.Println("mutex ", c.cnt)
+	fmt.Printf("a = %v, b = %v\n", a, b)
+	fmt.Printf("a + b = %v\n", sum(a, b))
+	fmt.Printf("a - b = %v\n", dif(a, b))
+	fmt.Printf("a * b = %v\n", mul(a, b))
+	fmt.Printf("a / b = %v\n", div(a, b))
 }
